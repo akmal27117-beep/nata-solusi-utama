@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sistem Penjualan & Stok Toko Listrik</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f3ef;--sf:#fff;--tx:#1d2733;--mu:#667281;--ln:#dcdcd4;--pr:#1f3a5f;--prt:#fff;--ac:#f2b705;--act:#1d2733;--rd:#c0392b;--gn:#237a4b;--hv:#ebebe4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12171d;--sf:#1b222b;--tx:#e8ebee;--mu:#93a0ae;--ln:#2d3743;--pr:#2c4d7c;--hv:#232c37;--rd:#ef6f61;--gn:#4cc58a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12171d;--sf:#1b222b;--tx:#e8ebee;--mu:#93a0ae;--ln:#2d3743;--pr:#2c4d7c;--hv:#232c37;--rd:#ef6f61;--gn:#4cc58a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 Barlow,system-ui,sans-serif}
+h1,h2,h3{font-family:"Barlow Condensed",Barlow,sans-serif;margin:0;letter-spacing:.2px}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+nav{background:var(--pr);color:var(--prt);padding:18px 12px;position:sticky;top:0;height:100vh;align-self:start}
+nav .brand{font:700 22px "Barlow Condensed",sans-serif;padding:4px 10px 18px;line-height:1.1}
+nav .brand small{display:block;font:400 12px Barlow;opacity:.7;margin-top:4px}
+nav button{display:flex;width:100%;gap:10px;align-items:center;background:none;border:0;color:inherit;text-align:left;padding:10px;border-radius:6px;font:500 15px Barlow;cursor:pointer;margin-bottom:2px}
+nav button:hover{background:rgba(255,255,255,.1)}
+nav button.on{background:var(--ac);color:var(--act);font-weight:700}
+nav .bd{margin-left:auto;background:var(--rd);color:#fff;border-radius:10px;font-size:12px;padding:0 7px}
+main{padding:24px;max-width:1100px;width:100%}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.head h2{font-size:30px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:16px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--sf);border:1px solid var(--ln);border-left:5px solid var(--ac);border-radius:8px;padding:12px 14px}
+.stat b{display:block;font:700 26px "Barlow Condensed",sans-serif}
+.stat span{color:var(--mu);font-size:13px}
+.stat.warn{border-left-color:var(--rd)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--ln);text-align:left;white-space:nowrap}
+th{color:var(--mu);font-weight:600;font-size:13px}
+td.r,th.r{text-align:right}
+tr:hover td{background:var(--hv)}
+.btn{background:var(--pr);color:var(--prt);border:0;border-radius:6px;padding:8px 14px;font:600 14px Barlow;cursor:pointer}
+.btn.ac{background:var(--ac);color:var(--act)}
+.btn.gh{background:none;color:var(--tx);border:1px solid var(--ln)}
+.btn.sm{padding:4px 9px;font-size:13px}
+.btn.dn{background:none;color:var(--rd);border:1px solid var(--rd)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,nav button:focus-visible{outline:3px solid var(--ac);outline-offset:1px}
+input,select{font:inherit;color:var(--tx);background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:8px 10px;width:100%}
+label{display:block;font-size:13px;color:var(--mu);margin-bottom:10px}
+label input,label select{margin-top:3px;color:var(--tx)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1 1 140px}
+.tag{display:inline-block;border-radius:4px;padding:1px 8px;font-size:12px;font-weight:600}
+.tag.lo{background:#fbe3df;color:#a02d20}.tag.ok{background:#dcf1e5;color:#1c6a40}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.lo{background:#4a2420;color:#ffb3aa}:root:not([data-theme="light"]) .tag.ok{background:#1d3d2d;color:#8ce0b4}}
+.pos{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.tot{display:flex;justify-content:space-between;padding:4px 0}
+.tot.big{font:700 26px "Barlow Condensed",sans-serif;border-top:2px solid var(--tx);margin-top:6px;padding-top:8px}
+.alert{background:#fff4d1;border:1px solid var(--ac);color:#5a4500;border-radius:8px;padding:10px 14px;margin-bottom:16px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .alert{background:#3a3110;color:#ffe08a}}
+dialog{border:1px solid var(--ln);border-radius:10px;background:var(--sf);color:var(--tx);padding:20px;width:min(460px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.nota{font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.empty{color:var(--mu);padding:18px 4px}
+#toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 18px;border-radius:6px;display:none;z-index:9}
+@media(max-width:820px){.app{grid-template-columns:1fr}nav{position:sticky;height:auto;z-index:5;display:flex;overflow-x:auto;gap:4px;padding:8px}nav .brand{display:none}nav button{width:auto;white-space:nowrap;margin:0}.pos{grid-template-columns:1fr}main{padding:14px}}
+</style>
+</head>
+<body>
+<div class="app">
+<nav id="nav"></nav>
+<main id="main"></main>
+</div>
+<dialog id="dlg"></dialog>
+<div id="toast" role="status"></div>
+<script>
+const KEY="toko-listrik-v1";
+const rp=n=>"Rp"+Math.round(n).toLocaleString("id-ID");
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Math.random().toString(36).slice(2,8);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const $=s=>document.querySelector(s);
+function seed(){
+ const I=(kode,nama,kat,sat,beli,jual,stok,min)=>({id:uid(),kode,nama,kat,sat,beli,jual,stok,min});
+ return{items:[
+  I("KBL-001","Kabel NYM 2x1,5 mm (roll 50 m)","Kabel","roll",285000,335000,12,5),
+  I("KBL-002","Kabel NYA 1,5 mm hitam (per meter)","Kabel","meter",3800,5000,120,50),
+  I("SKL-001","Saklar tunggal engkel","Saklar & Stop Kontak","pcs",9000,15000,40,15),
+  I("STK-001","Stop kontak 3 lubang + kabel 5 m","Saklar & Stop Kontak","pcs",32000,48000,4,10),
+  I("MCB-001","MCB 1P 10A","Pengaman","pcs",28000,42000,18,8),
+  I("MCB-002","MCB 2P 16A","Pengaman","pcs",65000,89000,6,6),
+  I("LMP-001","Lampu LED 12W","Lampu","pcs",18000,27000,55,20),
+  I("LMP-002","Fitting lampu gantung","Lampu","pcs",4500,8000,9,15),
+  I("PRK-001","Tang kombinasi 8\"","Perkakas","pcs",38000,59000,14,5),
+  I("PRK-002","Obeng set 6 pcs","Perkakas","set",34000,55000,3,5),
+  I("PRK-003","Meteran 5 m","Perkakas","pcs",14000,24000,22,8),
+  I("ISL-001","Isolasi listrik hitam","Aksesoris","pcs",4000,7000,60,25)],
+ sales:[],ins:[],outs:[],sup:["CV Sinar Listrik","PT Mitra Teknik"]};
+}
+let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.items)S=seed();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display="none",2200)}
+const low=()=>S.items.filter(i=>i.stok<=i.min);
+const item=id=>S.items.find(i=>i.id===id);
+const KATS=()=>[...new Set(S.items.map(i=>i.kat))];
+
+const VIEWS=[["dash","Dashboard"],["barang","Data barang"],["kasir","Kasir"],["masuk","Barang masuk"],["keluar","Barang keluar"],["lap","Laporan"]];
+let view="dash",cart=[],lapFrom=today().slice(0,8)+"01",lapTo=today(),q="";
+
+function nav(){
+ $("#nav").innerHTML='<div class="brand">Toko Listrik &amp; Teknik<small>akmal ganteng bgt asli</small></div>'+
+ VIEWS.map(([k,l])=>`<button data-v="${k}" class="${view===k?"on":""}">${l}${k==="barang"&&low().length?`<span class="bd">${low().length}</span>`:""}</button>`).join("");
+ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{view=b.dataset.v;q="";render()});
+}
+function render(){nav();$("#main").innerHTML=({dash,barang,kasir,masuk,keluar,lap})[view]();bind[view]&&bind[view]();window.scrollTo(0,0)}
+function openDlg(html){const d=$("#dlg");d.innerHTML=html;d.showModal();return d}
+function closeDlg(){$("#dlg").close()}
+const stokTag=i=>i.stok<=i.min?`<span class="tag lo">Menipis</span>`:`<span class="tag ok">Aman</span>`;
+
+/* ---------- Dashboard ---------- */
+function dash(){
+ const t=today(),sh=S.sales.filter(s=>s.tgl.slice(0,10)===t);
+ const omzet=sh.reduce((a,s)=>a+s.total,0),nilai=S.items.reduce((a,i)=>a+i.stok*i.beli,0),L=low();
+ return`<div class="head"><h2>Dashboard</h2><button class="btn ac" onclick="view='kasir';render()">Buka kasir</button></div>
+ ${L.length?`<div class="alert"><b>${L.length} barang di bawah atau sama dengan stok minimum:</b> ${L.slice(0,5).map(i=>esc(i.nama)).join(", ")}${L.length>5?", dan lainnya":""}. Segera catat barang masuk.</div>`:""}
+ <div class="stats">
+  <div class="stat"><b>${rp(omzet)}</b><span>Penjualan hari ini</span></div>
+  <div class="stat"><b>${sh.length}</b><span>Transaksi hari ini</span></div>
+  <div class="stat"><b>${S.items.length}</b><span>Jenis barang</span></div>
+  <div class="stat"><b>${rp(nilai)}</b><span>Nilai persediaan</span></div>
+  <div class="stat ${L.length?"warn":""}"><b>${L.length}</b><span>Stok menipis</span></div>
+ </div>
+ <div class="card"><h3>Barang yang perlu dipesan</h3>${L.length?`<div class="tw"><table><tr><th>Kode</th><th>Nama</th><th class="r">Stok</th><th class="r">Minimum</th></tr>${L.map(i=>`<tr><td>${esc(i.kode)}</td><td>${esc(i.nama)}</td><td class="r"><b>${i.stok}</b> ${i.sat}</td><td class="r">${i.min}</td></tr>`).join("")}</table></div>`:`<div class="empty">Semua stok masih di atas batas minimum.</div>`}</div>
+ <div class="card"><h3>Transaksi terakhir</h3>${S.sales.length?`<div class="tw"><table><tr><th>No. nota</th><th>Waktu</th><th class="r">Total</th></tr>${S.sales.slice(-5).reverse().map(s=>`<tr><td>${s.no}</td><td>${new Date(s.tgl).toLocaleString("id-ID")}</td><td class="r">${rp(s.total)}</td></tr>`).join("")}</table></div>`:`<div class="empty">Belum ada transaksi. Mulai dari menu Kasir.</div>`}</div>`;
+}
+
+/* ---------- Data barang ---------- */
+function barang(){
+ const f=S.items.filter(i=>(i.nama+i.kode+i.kat).toLowerCase().includes(q.toLowerCase()));
+ return`<div class="head"><h2>Data barang</h2><button class="btn ac" id="add">Tambah barang</button></div>
+ <div class="card"><input id="q" placeholder="Cari kode, nama, atau kategori" value="${esc(q)}" style="max-width:360px;margin-bottom:12px">
+ <div class="tw"><table><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th class="r">Harga beli</th><th class="r">Harga jual</th><th class="r">Stok</th><th>Status</th><th></th></tr>
+ ${f.map(i=>`<tr><td>${esc(i.kode)}</td><td>${esc(i.nama)}</td><td>${esc(i.kat)}</td><td class="r">${rp(i.beli)}</td><td class="r">${rp(i.jual)}</td><td class="r">${i.stok} ${esc(i.sat)}</td><td>${stokTag(i)}</td><td><button class="btn gh sm" data-e="${i.id}">Ubah</button> <button class="btn dn sm" data-d="${i.id}">Hapus</button></td></tr>`).join("")||`<tr><td colspan="8" class="empty">Tidak ada barang yang cocok.</td></tr>`}</table></div></div>`;
+}
+function formBarang(id){
+ const i=id?item(id):{kode:"",nama:"",kat:"",sat:"pcs",beli:0,jual:0,stok:0,min:5};
+ const d=openDlg(`<h3>${id?"Ubah barang":"Tambah barang"}</h3><br>
+ <label>Kode<input id="f_kode" value="${esc(i.kode)}"></label>
+ <label>Nama barang<input id="f_nama" value="${esc(i.nama)}"></label>
+ <div class="row"><label>Kategori<input id="f_kat" list="kats" value="${esc(i.kat)}"><datalist id="kats">${KATS().map(k=>`<option value="${esc(k)}">`).join("")}</datalist></label><label>Satuan<input id="f_sat" value="${esc(i.sat)}"></label></div>
+ <div class="row"><label>Harga beli<input id="f_beli" type="number" min="0" value="${i.beli}"></label><label>Harga jual<input id="f_jual" type="number" min="0" value="${i.jual}"></label></div>
+ <div class="row"><label>Stok awal<input id="f_stok" type="number" min="0" value="${i.stok}" ${id?"disabled":""}></label><label>Stok minimum<input id="f_min" type="number" min="0" value="${i.min}"></label></div>
+ <div class="row" style="justify-content:flex-end"><button class="btn gh" onclick="closeDlg()" style="flex:0 0 auto">Batal</button><button class="btn" id="f_ok" style="flex:0 0 auto">Simpan barang</button></div>`);
+ $("#f_ok").onclick=()=>{
+  const v=k=>$("#f_"+k).value.trim(),n=k=>Math.max(0,+$("#f_"+k).value||0);
+  if(!v("kode")||!v("nama")){toast("Kode dan nama barang wajib diisi");return}
+  if(S.items.some(x=>x.kode===v("kode")&&x.id!==id)){toast("Kode barang sudah dipakai");return}
+  const o={kode:v("kode"),nama:v("nama"),kat:v("kat")||"Lainnya",sat:v("sat")||"pcs",beli:n("beli"),jual:n("jual"),min:n("min")};
+  if(id)Object.assign(item(id),o);else S.items.push({id:uid(),stok:n("stok"),...o});
+  save();closeDlg();render();toast("Barang tersimpan");
+ };
+}
+
+/* ---------- Kasir ---------- */
+function kasir(){
+ const f=S.items.filter(i=>(i.nama+i.kode).toLowerCase().includes(q.toLowerCase()));
+ return`<div class="head"><h2>Kasir</h2></div><div class="pos">
+ <div class="card"><input id="q" placeholder="Cari barang atau kode" value="${esc(q)}" style="margin-bottom:10px">
+ <div class="tw" style="max-height:480px;overflow-y:auto"><table>${f.map(i=>`<tr><td>${esc(i.nama)}<br><small style="color:var(--mu)">${esc(i.kode)} · stok ${i.stok} ${esc(i.sat)}</small></td><td class="r">${rp(i.jual)}</td><td><button class="btn sm" data-a="${i.id}" ${i.stok<=0?"disabled":""}>Tambah</button></td></tr>`).join("")}</table></div></div>
+ <div class="card" id="cart"></div></div>`;
+}
+function cartHtml(){
+ const sub=cart.reduce((a,c)=>a+c.qty*item(c.id).jual,0);
+ const dis=Math.min(sub,Math.max(0,+(cart.dis||0)));
+ const tot=sub-dis;
+ return`<h3>Keranjang</h3>${cart.length?`<div class="tw"><table>${cart.map((c,x)=>{const i=item(c.id);return`<tr><td>${esc(i.nama)}<br><small>${rp(i.jual)}</small></td><td style="width:84px"><input type="number" min="1" max="${i.stok}" value="${c.qty}" data-q="${x}"></td><td class="r">${rp(c.qty*i.jual)}</td><td><button class="btn dn sm" data-r="${x}" aria-label="Hapus">×</button></td></tr>`}).join("")}</table></div>`:`<div class="empty">Pilih barang di sebelah kiri untuk memulai transaksi.</div>`}
+ <div class="tot"><span>Subtotal</span><span>${rp(sub)}</span></div>
+ <label>Diskon (Rp)<input type="number" min="0" id="dis" value="${cart.dis||0}"></label>
+ <div class="tot big"><span>Total</span><span>${rp(tot)}</span></div>
+ <label style="margin-top:10px">Uang diterima (Rp)<input type="number" min="0" id="bayar" value="${cart.bayar||""}"></label>
+ <div class="tot"><span>Kembalian</span><span id="kem">${rp(Math.max(0,(+cart.bayar||0)-tot))}</span></div>
+ <button class="btn ac" id="pay" style="width:100%;margin-top:8px" ${cart.length?"":"disabled"}>Bayar dan simpan transaksi</button>`;
+}
+function bindCart(){
+ $("#cart").innerHTML=cartHtml();
+ document.querySelectorAll("[data-q]").forEach(e=>e.onchange=()=>{const c=cart[+e.dataset.q],i=item(c.id);c.qty=Math.min(i.stok,Math.max(1,+e.value||1));bindCart()});
+ document.querySelectorAll("[data-r]").forEach(e=>e.onclick=()=>{const d=cart.dis,b=cart.bayar;cart.splice(+e.dataset.r,1);cart.dis=d;cart.bayar=b;bindCart()});
+ $("#dis").onchange=e=>{cart.dis=+e.target.value||0;bindCart()};
+ $("#bayar").oninput=e=>{cart.bayar=+e.target.value||0;const sub=cart.reduce((a,c)=>a+c.qty*item(c.id).jual,0);$("#kem").textContent=rp(Math.max(0,cart.bayar-(sub-Math.min(sub,cart.dis||0))))};
+ $("#pay").onclick=pay;
+}
+function pay(){
+ const sub=cart.reduce((a,c)=>a+c.qty*item(c.id).jual,0),dis=Math.min(sub,cart.dis||0),tot=sub-dis;
+ for(const c of cart){const i=item(c.id);if(c.qty>i.stok){toast("Stok "+i.nama+" tidak cukup");return}}
+ if((cart.bayar||0)<tot){toast("Uang diterima kurang dari total");return}
+ const s={no:"TRX-"+today().replace(/-/g,"")+"-"+String(S.sales.length+1).padStart(3,"0"),tgl:new Date().toISOString(),
+  items:cart.map(c=>{const i=item(c.id);return{id:i.id,nama:i.nama,qty:c.qty,harga:i.jual,beli:i.beli,sat:i.sat}}),diskon:dis,total:tot,bayar:cart.bayar};
+ cart.forEach(c=>item(c.id).stok-=c.qty);
+ S.sales.push(s);save();cart=[];
+ const kem=s.bayar-s.total,warn=low().length;
+ openDlg(`<h3>Transaksi berhasil</h3><div class="nota"><p>${s.no}<br>${new Date(s.tgl).toLocaleString("id-ID")}</p>
+ ${s.items.map(x=>`<div class="tot"><span>${esc(x.nama)}<br>${x.qty} ${esc(x.sat)} × ${rp(x.harga)}</span><span>${rp(x.qty*x.harga)}</span></div>`).join("")}
+ <div class="tot"><span>Diskon</span><span>${rp(s.diskon)}</span></div><div class="tot"><b>Total</b><b>${rp(s.total)}</b></div>
+ <div class="tot"><span>Bayar</span><span>${rp(s.bayar)}</span></div><div class="tot"><span>Kembali</span><span>${rp(kem)}</span></div></div>
+ ${warn?`<div class="alert" style="margin-top:10px">${warn} barang sekarang berada di batas stok minimum.</div>`:""}
+ <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn gh" onclick="window.print()" style="flex:0 0 auto">Cetak nota</button><button class="btn" onclick="closeDlg();render()" style="flex:0 0 auto">Transaksi baru</button></div>`);
+}
+
+/* ---------- Barang masuk ---------- */
+const opts=()=>S.items.map(i=>`<option value="${i.id}">${esc(i.kode)} - ${esc(i.nama)}</option>`).join("");
+function masuk(){
+ return`<div class="head"><h2>Barang masuk</h2></div>
+ <div class="card"><h3>Catat pembelian dari supplier</h3><br>
+ <div class="row"><label>Tanggal<input type="date" id="m_tgl" value="${today()}"></label><label>Supplier<input id="m_sup" list="sups" placeholder="Nama supplier"><datalist id="sups">${S.sup.map(s=>`<option value="${esc(s)}">`).join("")}</datalist></label></div>
+ <div class="row"><label>Barang<select id="m_brg">${opts()}</select></label><label>Jumlah<input type="number" min="1" id="m_qty" value="1"></label><label>Harga beli satuan (Rp)<input type="number" min="0" id="m_hrg"></label></div>
+ <button class="btn" id="m_ok">Simpan barang masuk</button></div>
+ <div class="card"><h3>Riwayat barang masuk</h3>${S.ins.length?`<div class="tw"><table><tr><th>Tanggal</th><th>Supplier</th><th>Barang</th><th class="r">Jumlah</th><th class="r">Harga</th></tr>${S.ins.slice().reverse().map(m=>`<tr><td>${m.tgl}</td><td>${esc(m.sup)}</td><td>${esc(m.nama)}</td><td class="r">${m.qty}</td><td class="r">${rp(m.harga)}</td></tr>`).join("")}</table></div>`:`<div class="empty">Belum ada pencatatan barang masuk.</div>`}</div>`;
+}
+/* ---------- Barang keluar ---------- */
+function keluar(){
+ return`<div class="head"><h2>Barang keluar</h2></div>
+ <div class="card"><h3>Catat barang keluar di luar penjualan</h3><p style="color:var(--mu);margin:4px 0 12px">Penjualan di kasir sudah mengurangi stok otomatis. Form ini untuk retur ke supplier, barang rusak, hilang, atau koreksi stok.</p>
+ <div class="row"><label>Tanggal<input type="date" id="k_tgl" value="${today()}"></label><label>Alasan<select id="k_als"><option>Rusak</option><option>Retur ke supplier</option><option>Hilang</option><option>Koreksi stok opname</option></select></label></div>
+ <div class="row"><label>Barang<select id="k_brg">${opts()}</select></label><label>Jumlah<input type="number" min="1" id="k_qty" value="1"></label></div>
+ <button class="btn" id="k_ok">Simpan barang keluar</button></div>
+ <div class="card"><h3>Riwayat barang keluar</h3>${S.outs.length||S.sales.length?`<div class="tw"><table><tr><th>Tanggal</th><th>Barang</th><th class="r">Jumlah</th><th>Keterangan</th></tr>
+ ${[...S.outs.map(o=>({t:o.tgl,n:o.nama,q:o.qty,k:o.alasan})),...S.sales.flatMap(s=>s.items.map(x=>({t:s.tgl.slice(0,10),n:x.nama,q:x.qty,k:"Penjualan "+s.no})))].sort((a,b)=>b.t.localeCompare(a.t)).slice(0,80).map(r=>`<tr><td>${r.t}</td><td>${esc(r.n)}</td><td class="r">${r.q}</td><td>${esc(r.k)}</td></tr>`).join("")}</table></div>`:`<div class="empty">Belum ada barang keluar.</div>`}</div>`;
+}
+
+/* ---------- Laporan ---------- */
+function lap(){
+ const sl=S.sales.filter(s=>{const d=s.tgl.slice(0,10);return d>=lapFrom&&d<=lapTo});
+ const omzet=sl.reduce((a,s)=>a+s.total,0),hpp=sl.reduce((a,s)=>a+s.items.reduce((b,x)=>b+x.qty*x.beli,0),0);
+ const per={};sl.forEach(s=>s.items.forEach(x=>{const p=per[x.nama]||(per[x.nama]={q:0,r:0});p.q+=x.qty;p.r+=x.qty*x.harga}));
+ const top=Object.entries(per).sort((a,b)=>b[1].q-a[1].q).slice(0,8);
+ return`<div class="head"><h2>Laporan</h2><button class="btn gh" onclick="window.print()">Cetak laporan</button></div>
+ <div class="card"><div class="row" style="max-width:480px"><label>Dari<input type="date" id="l_a" value="${lapFrom}"></label><label>Sampai<input type="date" id="l_b" value="${lapTo}"></label></div></div>
+ <div class="stats"><div class="stat"><b>${rp(omzet)}</b><span>Total penjualan</span></div><div class="stat"><b>${rp(omzet-hpp)}</b><span>Perkiraan laba kotor</span></div><div class="stat"><b>${sl.length}</b><span>Jumlah transaksi</span></div></div>
+ <div class="card"><h3>Laporan penjualan</h3>${sl.length?`<div class="tw"><table><tr><th>No. nota</th><th>Tanggal</th><th>Barang</th><th class="r">Diskon</th><th class="r">Total</th></tr>${sl.slice().reverse().map(s=>`<tr><td>${s.no}</td><td>${s.tgl.slice(0,10)}</td><td>${s.items.map(x=>esc(x.nama)+" ×"+x.qty).join(", ").slice(0,60)}</td><td class="r">${rp(s.diskon)}</td><td class="r">${rp(s.total)}</td></tr>`).join("")}</table></div>`:`<div class="empty">Tidak ada penjualan pada periode ini.</div>`}</div>
+ <div class="card"><h3>Barang terlaris</h3>${top.length?`<div class="tw"><table><tr><th>Barang</th><th class="r">Terjual</th><th class="r">Pendapatan</th></tr>${top.map(([n,p])=>`<tr><td>${esc(n)}</td><td class="r">${p.q}</td><td class="r">${rp(p.r)}</td></tr>`).join("")}</table></div>`:`<div class="empty">Belum ada data.</div>`}</div>
+ <div class="card"><h3>Laporan persediaan</h3><div class="tw"><table><tr><th>Kode</th><th>Nama</th><th class="r">Stok</th><th class="r">Min.</th><th class="r">Nilai (harga beli)</th><th>Status</th></tr>${S.items.map(i=>`<tr><td>${esc(i.kode)}</td><td>${esc(i.nama)}</td><td class="r">${i.stok} ${esc(i.sat)}</td><td class="r">${i.min}</td><td class="r">${rp(i.stok*i.beli)}</td><td>${stokTag(i)}</td></tr>`).join("")}</table></div></div>`;
+}
+
+/* ---------- Bindings ---------- */
+const bind={
+ barang(){
+  $("#add").onclick=()=>formBarang();
+  $("#q").oninput=e=>{q=e.target.value;const p=e.target.selectionStart;render();const n=$("#q");n.focus();n.setSelectionRange(p,p)};
+  document.querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>formBarang(b.dataset.e));
+  document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{const i=item(b.dataset.d);
+   const d=openDlg(`<h3>Hapus barang?</h3><p>${esc(i.nama)} akan dihapus dari daftar. Riwayat transaksi tetap tersimpan.</p><div class="row" style="justify-content:flex-end"><button class="btn gh" onclick="closeDlg()" style="flex:0 0 auto">Batal</button><button class="btn dn" id="yes" style="flex:0 0 auto">Hapus barang</button></div>`);
+   $("#yes").onclick=()=>{S.items=S.items.filter(x=>x.id!==i.id);save();closeDlg();render();toast("Barang dihapus")}});
+ },
+ kasir(){
+  bindCart();
+  $("#q").oninput=e=>{q=e.target.value;const p=e.target.selectionStart,d=cart.dis,b=cart.bayar;render();cart.dis=d;cart.bayar=b;const n=$("#q");n.focus();n.setSelectionRange(p,p)};
+  document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{
+   const i=item(b.dataset.a),c=cart.find(x=>x.id===i.id);
+   if(c){if(c.qty>=i.stok){toast("Stok tersisa "+i.stok);return}c.qty++}else cart.push({id:i.id,qty:1});bindCart()});
+ },
+ masuk(){
+  $("#m_brg").onchange=()=>{$("#m_hrg").value=item($("#m_brg").value).beli};$("#m_hrg").value=item($("#m_brg").value)?.beli||"";
+  $("#m_ok").onclick=()=>{
+   const i=item($("#m_brg").value),qty=+$("#m_qty").value,h=+$("#m_hrg").value,sup=$("#m_sup").value.trim();
+   if(!i||qty<1){toast("Isi barang dan jumlah dengan benar");return}
+   if(!sup){toast("Nama supplier wajib diisi");return}
+   i.stok+=qty;if(h>0)i.beli=h;if(!S.sup.includes(sup))S.sup.push(sup);
+   S.ins.push({tgl:$("#m_tgl").value,sup,id:i.id,nama:i.nama,qty,harga:h});save();render();toast("Barang masuk tersimpan, stok bertambah");
+  };
+ },
+ keluar(){
+  $("#k_ok").onclick=()=>{
+   const i=item($("#k_brg").value),qty=+$("#k_qty").value;
+   if(!i||qty<1){toast("Isi barang dan jumlah dengan benar");return}
+   if(qty>i.stok){toast("Jumlah melebihi stok ("+i.stok+")");return}
+   i.stok-=qty;S.outs.push({tgl:$("#k_tgl").value,id:i.id,nama:i.nama,qty,alasan:$("#k_als").value});save();render();toast("Barang keluar tersimpan, stok berkurang");
+  };
+ },
+ lap(){$("#l_a").onchange=e=>{lapFrom=e.target.value;render()};$("#l_b").onchange=e=>{lapTo=e.target.value;render()}}
+};
+render();
+</script>
+</body>
+</html>
